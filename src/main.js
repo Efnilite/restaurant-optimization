@@ -121,7 +121,7 @@ function drawStaff() {
 function getStaffTask(id) {
     const task = staff.filter(s => s.id === id)[0].task
 
-    return task ? task.constructor.name : "Idling"
+    return task ? task.constructor.name.substring(4) : "Idling"
 }
 
 function getGroupStaff(group) {
@@ -149,7 +149,7 @@ function getGroupTask(group) {
         }
 
         if (task.table.group.id === group.id) {
-            return task.constructor.name;
+            return task.constructor.name.substring(4);
         }
     }
     return "No Task"
