@@ -14,7 +14,7 @@ const wage = 10
 
 const door = {x: 300, y: 500}
 const kitchen = {x: 550, y: 50}
-const staffSendsOrdersRemotely = false
+let staffSendsOrdersRemotely = false
 
 // Reset by initialzeSimulation
 let tables = []
@@ -270,7 +270,7 @@ function createGroup() {
         stepsEatingDesert: randomFromNormalDistribution(secondsEatingDesert) * FPS,
         stepsPaying: randomFromNormalDistribution(secondsPaying) * FPS
     }
-    groups[group.id] = group
+    groups[id] = group
 
     new TaskSit(group)
 
