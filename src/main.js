@@ -111,7 +111,48 @@ function drawStaff() {
         ctx.textAlign = "left";
         ctx.font = `${Math.round(size / 4)}px Arial`;
         ctx.fillText(i, left + 2, top + 2)
+
+        // additional info
+        ctx.fillText(getStaffTask(i), left + 2, top + 16)
+
     })
+}
+
+function getStaffTask(id) {
+    const task = staff.filter(s => s.id === id)[0].task
+
+    return task ? task.constructor.name : "Idling"
+}
+
+function getGroupStaff(group) {
+    const table = tables.filter(t => t.group != null && t.group.id === group.id)
+
+    if (table.length === 0) {
+        return "No Table"
+    }
+
+    const s = staff.filter(s => s.task != null && s.task.table !== undefined && s.task.table.id === table[0].id)
+
+    return s.length > 0 ? "Staff #" + s[0].id : "No Staff"
+}
+
+function getGroupTask(group) {
+    for (const taskId in Task.taken) {
+        const task = Task.taken[taskId]
+
+        if (task.table === undefined || task.table === null) {
+            continue
+        }
+
+        if (task.table.group === undefined) {
+            continue
+        }
+
+        if (task.table.group.id === group.id) {
+            return task.constructor.name;
+        }
+    }
+    return "No Task"
 }
 
 function drawGroups() {
@@ -130,11 +171,9 @@ function drawGroups() {
         ctx.textAlign = "left";
         ctx.font = `${Math.round(size / 4)}px Arial`;
         ctx.fillText(id, left + 2, top + 2)
-
-        ctx.textBaseline = "middle";
-        ctx.textAlign = "center";
-        ctx.font = `${Math.round(size / 2)}px Arial`;
-        ctx.fillText(group.size, x, y)
+        ctx.fillText(group.size, left + size - 10, top + 2)
+        ctx.fillText(getGroupStaff(group), left + 2, top + 18)
+        ctx.fillText(getGroupTask(group), left + 2, top + 30)
     }
 }
 
@@ -233,7 +272,7 @@ function createGroup() {
     }
     groups[group.id] = group
 
-    new TaskSeat(group)
+    new TaskSit(group)
 
     return group
 }
@@ -253,13 +292,13 @@ function initializeSimulation() {
     stepNextGroupArrives = poisson(averageGroups, stepsToSimulate)
 
     Task.initialize()
-    TaskSeat.initialize()
+    TaskSit.initialize()
     TaskOrderDrinks.initialize()
     TaskOrderFood.initialize()
     TaskOrderDesert.initialize()
-    TaskDeliverOrder.initialize()
-    TaskPrepareItem.initialize()
-    TaskDeliverItems.initialize()
+    TaskDeliverOrderToKitchen.initialize()
+    TaskPrepareItemInKitchen.initialize()
+    TaskDeliverOrderToTable.initialize()
     TaskPay.initialize()
 
     income = 0;
@@ -341,17 +380,6 @@ function initializeSimulation() {
     draw()
 }
 
-function canPrepareItem(staff, item) {
-    switch (item.type) {
-        case 'drink':
-            return staff.doesTaskPrepareDrink;
-        case 'food':
-            return staff.doesTaskPrepareFood;
-        case 'desert':
-            return staff.doesTaskPrepareDesert;
-    }
-}
-
 function doStep() {
 
     if (currentStep >= stepNextGroupArrives) {
@@ -363,11 +391,11 @@ function doStep() {
 
     // do not seat new groups after closing
     if (currentStep >= stepsToSimulate) {
-        for (const id in TaskSeat.open) {
-            const task = TaskSeat.open[id]
+        for (const id in TaskSit.open) {
+            const task = TaskSit.open[id]
 
             destroyGroup(task.group)
-            delete TaskSeat.open[task.id]
+            delete TaskSit.open[task.id]
         }
     }
 
@@ -380,8 +408,8 @@ function doStep() {
     }
 
     // assign new tasks
-    for (const id in TaskSeat.open) {
-        const task = TaskSeat.open[id]
+    for (const id in TaskSit.open) {
+        const task = TaskSit.open[id]
 
         const availableStaff = staff.filter(s => s.task == null && s.doesTaskSeat)
         if (availableStaff.length === 0) continue;
@@ -413,7 +441,7 @@ function doStep() {
             task.staff.task = task
             task.table.group = task.group
 
-            delete TaskSeat.open[task.id]
+            delete TaskSit.open[task.id]
             Task.taken[task.id] = task
 
             break;
@@ -488,8 +516,8 @@ function doStep() {
         Task.taken[task.id] = task
     }
 
-    for (const id in TaskPrepareItem.open) {
-        const task = TaskPrepareItem.open[id]
+    for (const id in TaskPrepareItemInKitchen.open) {
+        const task = TaskPrepareItemInKitchen.open[id]
 
         const availableStaff = staff.filter(s => s.task == null && canPrepareItem(s, task.item))
         if (availableStaff.length === 0) continue;
@@ -499,12 +527,12 @@ function doStep() {
         task.staff = nearestStaff
         task.staff.task = task
 
-        delete TaskPrepareItem.open[task.id]
+        delete TaskPrepareItemInKitchen.open[task.id]
         Task.taken[task.id] = task
     }
 
-    for (const id in TaskDeliverOrder.open) {
-        const task = TaskDeliverOrder.open[id]
+    for (const id in TaskDeliverOrderToKitchen.open) {
+        const task = TaskDeliverOrderToKitchen.open[id]
 
         if (task.staff.task != null) continue;
 
@@ -512,12 +540,12 @@ function doStep() {
 
         task.staff.task = task
 
-        delete TaskDeliverOrder.open[task.id]
+        delete TaskDeliverOrderToKitchen.open[task.id]
         Task.taken[task.id] = task
     }
 
-    for (const id in TaskDeliverItems.open) {
-        const task = TaskDeliverItems.open[id]
+    for (const id in TaskDeliverOrderToTable.open) {
+        const task = TaskDeliverOrderToTable.open[id]
 
         const availableStaff = staff.filter(s => s.task == null && s.doesTaskDeliverOrder)
         if (availableStaff.length === 0) continue;
@@ -529,7 +557,7 @@ function doStep() {
         task.staff = nearestStaff
         task.staff.task = task
 
-        delete TaskDeliverItems.open[task.id]
+        delete TaskDeliverOrderToTable.open[task.id]
         Task.taken[task.id] = task
     }
 
@@ -565,7 +593,7 @@ function draw() {
     ctx.fillText(Math.floor(currentStep / FPS), 2, 2)
 }
 
-let timeScale = 1000
+let timeScale = 1
 
 /**
  * Whether the simulation should continue.

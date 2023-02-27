@@ -5,11 +5,11 @@ let secondsDurationDeliverDrink = 3;
 /**
  * Task for delivering items to a table.
  */
-class TaskDeliverItems extends Task {
+class TaskDeliverOrderToTable extends Task {
     static open;
 
     static initialize() {
-        TaskDeliverItems.open = {}
+        TaskDeliverOrderToTable.open = {}
     }
 
     /**
@@ -24,7 +24,7 @@ class TaskDeliverItems extends Task {
     constructor(order) {
         super()
         // add to task queue
-        TaskDeliverItems.open[this.id] = this
+        TaskDeliverOrderToTable.open[this.id] = this
 
         this.order = order;
 
@@ -54,13 +54,13 @@ class TaskDeliverItems extends Task {
 }
 
 /**
- * Task to prepare an item in the kitchen.
+ * Task to prepare a specific item in the kitchen.
  */
-class TaskPrepareItem extends Task {
+class TaskPrepareItemInKitchen extends Task {
     static open;
 
     static initialize() {
-        TaskPrepareItem.open = {}
+        TaskPrepareItemInKitchen.open = {}
     }
 
     /**
@@ -82,7 +82,7 @@ class TaskPrepareItem extends Task {
 
     constructor(item, onDone) {
         super()
-        TaskPrepareItem.open[this.id] = this
+        TaskPrepareItemInKitchen.open[this.id] = this
 
         this.item = item;
         this.onDone = onDone;
@@ -109,9 +109,10 @@ class TaskPrepareItem extends Task {
 }
 
 /**
- * Task to prepare an order by a table.
+ * Task where an entire order by a table gets prepared in the kitchen.
+ * Each item gets prepared using {@link TaskPrepareItemInKitchen}
  */
-class TaskPrepareOrder extends Task {
+class TaskPrepareOrderInKitchen extends Task {
 
     tasksOpen;
 
@@ -125,13 +126,13 @@ class TaskPrepareOrder extends Task {
         }
 
         for (const item of order.items) {
-            this.tasksOpen.add(new TaskPrepareItem(item, closeTask))
+            this.tasksOpen.add(new TaskPrepareItemInKitchen(item, closeTask))
         }
 
         this.phases = [
             () => {
                 if (this.tasksOpen.size === 0) {
-                    new TaskDeliverItems(order)
+                    new TaskDeliverOrderToTable(order)
 
                     this.done()
                 }
@@ -143,14 +144,14 @@ class TaskPrepareOrder extends Task {
 }
 
 /**
- * Task where an order is delivered.
+ * Task where an order is delivered to the kitchen to be prepared.
  */
-class TaskDeliverOrder extends Task {
+class TaskDeliverOrderToKitchen extends Task {
 
     static open;
 
     static initialize() {
-        TaskDeliverOrder.open = {}
+        TaskDeliverOrderToKitchen.open = {}
     }
 
     order;
@@ -160,18 +161,40 @@ class TaskDeliverOrder extends Task {
         this.order = order;
         this.staff = staff
 
-        TaskDeliverOrder.open[this.id] = this;
+        TaskDeliverOrderToKitchen.open[this.id] = this;
 
         this.phases = [
             // move order
             () => {
                 if (this.staff.x === kitchen.x && this.staff.y === kitchen.y) {
-                    new TaskPrepareOrder(this.order)
+                    new TaskPrepareOrderInKitchen(this.order)
                     this.done();
                 } else {
                     moveTowards(this.staff, kitchen)
                 }
             }
         ]
+    }
+}
+
+/**
+ * Returns whether a staff member can prepare a specific item.
+ *
+ * @param   staff
+ *          The staff member.
+ *
+ * @param   item
+ *          The item to prepare.
+ *
+ * @return {*} true if able to, false if not.
+ */
+function canPrepareItem(staff, item) {
+    switch (item.type) {
+        case 'drink':
+            return staff.doesTaskPrepareDrink;
+        case 'food':
+            return staff.doesTaskPrepareFood;
+        case 'desert':
+            return staff.doesTaskPrepareDesert;
     }
 }

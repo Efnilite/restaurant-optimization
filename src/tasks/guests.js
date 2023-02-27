@@ -2,7 +2,7 @@
     This file documents all interactions which are related to guest movement/interaction.
     The class order follows the life-cycle of a group.
 
-    1) TaskSeat - take a seat
+    1) TaskSit - take a seat
     2) TaskOrderDrinks - order drinks
     3) TaskOrderFood - order food
     4) TaskOrderDesert - order desert
@@ -12,11 +12,11 @@
 /**
  * Task where guests take a seat.
  */
-class TaskSeat extends Task {
+class TaskSit extends Task {
     static open;
 
     static initialize() {
-        TaskSeat.open = {}
+        TaskSit.open = {}
     }
 
     group;
@@ -25,7 +25,7 @@ class TaskSeat extends Task {
 
     constructor(group) {
         super()
-        TaskSeat.open[this.id] = this
+        TaskSit.open[this.id] = this
 
         this.group = group
 
