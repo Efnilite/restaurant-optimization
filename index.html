@@ -2,28 +2,110 @@
 <html>
 
 <head>
+  <title>HoReKanjer Simulatietool</title>
   <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #main {
+      height: 100vh;
+      display: flex;
+      flex-direction: row;
+    }
+
+    #left {
+      flex-grow: 0;
+      flex-shrink: 0;
+      overflow: auto;
+
+      width: 420px;
+    }
+    #config {
+      margin: 0;
+      border: none;
+      outline: none;
+      resize: none;
+
+      padding: 8px;
+      box-sizing: border-box;
+
+      background-color: beige;
+
+      width: 100%;
+      height: 100%;
+      white-space: pre;
+      overflow: auto;
+
+      font-family: 'Courier New', Courier, monospace;
+
+    }
+
+  
     canvas {
       border: 1px solid black;
     }
+
+    #right {
+      flex-grow: 1;
+      flex-shrink: 1;
+      overflow: auto;
+      
+      display: flex;
+      flex-direction: column;
+    }
+
+    #controls {
+      flex-grow: 0;
+      flex-shrink: 0;
+    }
+
+    #simulation {
+      flex-shrink: 1;
+      flex-grow: 1;
+      flex-wrap: wrap;
+
+      overflow: auto;
+    }
+    
   </style>
 </head>
 
 <body>
-  <canvas id="canvas" width="600" height="600"></canvas>
-  <div>
-    <button id="play">Play</button>
-    <button id="pause">Pause</button>
-    <button id="reset">Reset</button>
+  <div id="main">
+    <div id="left">
+      <textarea id="config" spellcheck="false"></textarea>
+    </div>
+    <div id="right">
+      <div id="controls">
+        <button id="play">Play</button>
+        <button id="pause">Pause</button>
+        <button id="reset">Reset</button>
+
+        <input type="radio" id="time-scale-1" name="time-scale" value="1">
+        <label for="time-scale-1">1</label>
+        <input type="radio" id="time-scale-5" name="time-scale" value="5" checked>
+        <label for="time-scale-5">5</label>
+        <input type="radio" id="time-scale-10" name="time-scale" value="10">
+        <label for="time-scale-10">10</label>
+        <input type="radio" id="time-scale-100" name="time-scale" value="100">
+        <label for="time-scale-100">100</label>
+        <input type="radio" id="time-scale-1000" name="time-scale" value="1000">
+        <label for="time-scale-1000">1000</label>
+
+        <button id="scale">Scale: 1</button>
+        <button id="result-only">Result only</button>
+      </div>
+
+      <div id="simulation">
+        <canvas id="canvas" width="1600" height="1600"></canvas>
+      </div>
+    </div>
   </div>
 
-  <script src="src/tasks/task.js"></script>
-  <script src="src/tasks/staff.js"></script>
-  <script src="src/order.js"></script>
-  <script src="src/tasks/guests.js"></script>
-  <script src="src/metrics.js"></script>
-  <script src="src/main.js"></script>
-  <script src="src/optimalizer.js"></script>
+  <script src="main.js"></script>
 </body>
 
 </html>

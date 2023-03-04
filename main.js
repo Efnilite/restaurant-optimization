@@ -1,28 +1,59 @@
+let logging = true;
+function log(x) {
+  if (logging) console.log(x)
+}
+
 const canvas = document.getElementById("canvas")
 const ctx = canvas.getContext("2d")
+const configTextArea = document.getElementById('config')
+const buttonScale = document.getElementById('scale');
 
-const size = 50
+let scale = 1;
+buttonScale.addEventListener('click', () => {
+  if (scale == 1) {
+    scale = 0.5;
+    buttonScale.textContent = 'Scale: 0.5'
+    draw()
+  } else if (scale == 0.5) {
+    scale = 1;
+    buttonScale.textContent = 'Scale: 1'
+    draw()
+  }
+})
 
-let secondsOrdering = {mean : 10, standardDeviation : 5}
-let secondsDecidingFood = {mean : 5 * 60, standardDeviation : 3 * 60}
-let secondsEatingFood = {mean : 15 * 60, standardDeviation : 5 * 60}
-let secondsEatingDesert = {mean : 10 * 60, standardDeviation : 3 * 60}
-let secondsPaying = {mean : 30, standardDeviation : 10}
+// Should be initialized in config in tool
+let secondsAcceptingGroups;
+let groupSizes;
+let averageGroups;
+let initialGroups;
+
+let secondsOrdering;
+let secondsDecidingFood;
+let secondsEatingFood;
+let secondsEatingDesert;
+let secondsPaying;
+
+let entrance;
+let kitchen;
+let drinks;
+let foods;
+let deserts;
+let tables;
+let staff;
+
+let staffSendsOrdersRemotely;
+////////
+
 
 // Reset by initialzeSimulation
-let tables = []
-let staff = []
-let drinks = []
-let foods = []
-let deserts = []
-let groups = {}
-let nextGroupId = 0;
-let wage = 10
-let groupEntranceExit = { x: 300, y: 500 }
-let kitchen = { x: 550, y: 50 }
-let staffSendsOrdersRemotely = false
-let income = 0;
+let stepsAcceptingGroups;
+let groups;
+let nextGroupId;
+let income;
+let totalGroups;
+let totalGuests;
 ////////
+
 
 class Task {
   static taken;
@@ -99,16 +130,17 @@ class TaskDeliverItems extends Task {
 }
 
 function calculateMetrics() {
-  const s = staff.map(s=>{return {id: s.id, uptime : 1-(s.stepsIdle/stepsToSimulate), wastedWage : s.wage * (s.stepsIdle / FPS) / 3600} });
-  const wastedWages = s.map(s=>s.wastedWage).reduce((a,b)=>a+b,0)
-  const wages = staff.map(s=>s.wage * secondsToSimulate / 3600).reduce((a,b)=>a+b,0)
+  const s = staff.map(s => { return { id: s.id, uptime: 1 - (s.stepsIdle / stepsAcceptingGroups) } });
+  const wages = staff.map(s => s.wage * secondsAcceptingGroups / 3600).reduce((a, b) => a + b, 0)
 
   return {
-    income : income,
-    wages : wages,
-    staff : s,
-    wastedWages : wastedWages,
-    profit : income - wages
+    totalSeconds : currentStep/FPS,
+    totalHMS : hms(currentStep),
+    totalGroups : totalGroups,
+    totalGuests : totalGuests,
+    income: income,
+    wages: wages,
+    staff: s
   }
 }
 
@@ -123,7 +155,6 @@ class TaskPrepareItem extends Task {
   item;
   onDone;
   stepStarted;
-  stepsDuration;
 
   constructor(item, onDone) {
     super()
@@ -132,19 +163,20 @@ class TaskPrepareItem extends Task {
     this.item = item;
     this.onDone = onDone;
 
-    this.stepsDuration = this.item.seconds * FPS;
-
     this.phases = [
       () => {
         if (this.staff.x == kitchen.x && this.staff.y == kitchen.y) {
           this.stepStarted = currentStep
           this.nextPhase()
+
+          log(`${hms(currentStep)} started preparing ${this.item.name} (${this.id})`)
         } else {
           moveTowards(this.staff, kitchen)
         }
       },
       () => {
-        if (currentStep >= this.stepStarted + this.stepsDuration) {
+        if (currentStep >= this.stepStarted + this.item.seconds * FPS) {
+          log(`${hms(currentStep)} done preparing ${this.item.name} (${this.id})`)
           this.onDone(this)
           this.done()
         }
@@ -178,8 +210,6 @@ class TaskPrepareOrder extends Task {
       }
     ]
   }
-
-
 }
 
 class TaskDeliverOrder extends Task {
@@ -285,6 +315,8 @@ class TaskOrderDrinks extends Task {
           new TaskOrderFood(this.table)
 
           this.done()
+
+          log(`${hms(currentStep)} signal to order food (${this.table.group.id})`)
         }
       }
     ]
@@ -325,11 +357,15 @@ class TaskOrderFood extends Task {
           this.staff = null;
 
           this.nextPhase()
+
+          log(`${hms(currentStep)} placed food order (${this.table.group.id})`)
         }
       },
       () => {
         if (this.stepReceivedFood) {
           this.nextPhase()
+
+          log(`${hms(currentStep)} received food (${this.table.group.id})`)
         }
       },
       () => {
@@ -337,6 +373,8 @@ class TaskOrderFood extends Task {
           new TaskOrderDesert(this.table)
 
           this.done()
+
+          log(`${hms(currentStep)} done eating food (${this.table.group.id})`)
         }
       }
     ]
@@ -379,11 +417,15 @@ class TaskOrderDesert extends Task {
           this.staff = null;
 
           this.nextPhase()
+
+          log(`${hms(currentStep)} ordered desert (${this.table.group.id})`)
         }
       },
       () => {
         if (this.stepReceivedDesert) {
           this.nextPhase()
+
+          log(`${hms(currentStep)} received desert (${this.table.group.id})`)
         }
       },
       () => {
@@ -391,6 +433,8 @@ class TaskOrderDesert extends Task {
           new TaskPay(this.table)
 
           this.done()
+
+          log(`${hms(currentStep)} done eating desert, asking to pay (${this.table.group.id})`)
         }
       }
     ]
@@ -435,14 +479,18 @@ class TaskPay extends Task {
           this.staff = null;
 
           this.nextPhase()
+
+          log(`${hms(currentStep)} paid; leaving (${this.group.id})`)
         }
       },
       () => {
-        if (this.group.x == groupEntranceExit.x && this.group.y == groupEntranceExit.y) {
+        if (this.group.x == entrance.x && this.group.y == entrance.y) {
+          totalGroups++;
+          totalGuests += this.group.size
           destroyGroup(this.group)
           this.done()
         } else {
-          moveTowards(this.group, groupEntranceExit)
+          moveTowards(this.group, entrance)
         }
       }
     ]
@@ -525,8 +573,7 @@ function directionalUnitVector(from, to) {
   return [(to.x - from.x) / d, (to.y - from.y) / d]
 }
 
-const pixelsPerMeter = 100
-const v = 1.4 * pixelsPerMeter
+const v = 1.4 * 100
 
 function moveTowards(mover, target) {
   const d = v * dt
@@ -543,41 +590,49 @@ function moveTowards(mover, target) {
   }
 }
 
+const rectangleSize = 50
+
+function drawRectangle(x, y, color, center, topLeft) {
+  const top = y - rectangleSize / 2
+  const left = x - rectangleSize / 2
+
+  if (color == 'white') {
+    ctx.strokeStyle = 'black';
+    ctx.strokeRect(left, top, rectangleSize, rectangleSize)
+  } else {
+    ctx.fillStyle = color;
+    ctx.fillRect(left, top, rectangleSize, rectangleSize)
+  }
+
+  if (center != null) {
+    ctx.fillStyle = 'black';
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "center";
+    ctx.font = `${Math.round(rectangleSize / 1.5)}px Arial`;
+    ctx.fillText(center, x, y)
+  }
+
+  if (topLeft !== undefined) {
+
+    ctx.fillStyle = 'black'
+    ctx.textBaseline = "top";
+    ctx.textAlign = "left";
+    ctx.font = `${Math.round(rectangleSize / 2.5)}px Arial`;
+    ctx.fillText(topLeft, left + 2, top + 2)
+  }
+
+}
+
 function drawTables() {
   ctx.fillStyle = "black"
   tables.forEach((table, i) => {
-
-    const top = table.y - size / 2
-    const left = table.x - size / 2
-
-    ctx.strokeRect(left, top, size, size)
-
-    ctx.textBaseline = "top";
-    ctx.textAlign = "left";
-    ctx.font = `${Math.round(size / 4)}px Arial`;
-    ctx.fillText(i, left + 2, top + 2)
-
-    ctx.textBaseline = "middle";
-    ctx.textAlign = "center";
-    ctx.font = `${Math.round(size / 2)}px Arial`;
-    ctx.fillText(table.size, table.x, table.y)
+    drawRectangle(table.x, table.y, 'white', table.size, i)
   })
 }
 
 function drawStaff() {
-
   staff.forEach(({ x, y }, i) => {
-    const top = y - size / 2
-    const left = x - size / 2
-
-    ctx.fillStyle = "orange";
-    ctx.fillRect(left, top, size, size)
-
-    ctx.fillStyle = "black"
-    ctx.textBaseline = "top";
-    ctx.textAlign = "left";
-    ctx.font = `${Math.round(size / 4)}px Arial`;
-    ctx.fillText(i, left + 2, top + 2)
+    drawRectangle(x, y, 'orange', null, i)
   })
 }
 
@@ -586,77 +641,28 @@ function drawGroups() {
     const group = groups[id]
     const { x, y } = group
 
-    const top = y - size / 2
-    const left = x - size / 2
-
-    ctx.fillStyle = "DarkSeaGreen";
-    ctx.fillRect(left, top, size, size)
-
-    ctx.fillStyle = "black"
-    ctx.textBaseline = "top";
-    ctx.textAlign = "left";
-    ctx.font = `${Math.round(size / 4)}px Arial`;
-    ctx.fillText(id, left + 2, top + 2)
-
-    ctx.textBaseline = "middle";
-    ctx.textAlign = "center";
-    ctx.font = `${Math.round(size / 2)}px Arial`;
-    ctx.fillText(group.size, x, y)
+    drawRectangle(x, y, "DarkSeaGreen", group.size, id)
   }
 }
 
 function drawKitchen() {
   const { x, y } = kitchen
-
-  const top = y - size / 2
-  const left = x - size / 2
-
-  ctx.strokeStyle = "black";
-  ctx.strokeRect(left, top, size, size)
-
-  ctx.fillStyle = "black"
-  ctx.textBaseline = "middle";
-  ctx.textAlign = "center";
-  ctx.font = `${Math.round(size / 2)}px Arial`;
-  ctx.fillText('K', x, y)
+  drawRectangle(x, y, 'white', 'K')
 }
 
 function drawEntranceExit() {
-  const { x, y } = groupEntranceExit
-
-  const top = y - size / 2
-  const left = x - size / 2
-
-  ctx.strokeStyle = "black";
-  ctx.strokeRect(left, top, size, size)
-
-  ctx.fillStyle = "black"
-  ctx.textBaseline = "middle";
-  ctx.textAlign = "center";
-  ctx.font = `${Math.round(size / 2)}px Arial`;
-  ctx.fillText('E', x, y)
+  const { x, y } = entrance
+  drawRectangle(x, y, 'white', 'E')
 }
 
 function poisson(average, numSteps) {
   return Math.round(-Math.log(1 - Math.random()) / (average / numSteps))
 }
 
-function randomFromNormalDistribution({mean, standardDeviation}) {
+function randomFromNormalDistribution({ mean, standardDeviation }) {
   // Box-Muller method
   return mean + standardDeviation * Math.sqrt(-2.0 * Math.log(Math.random())) * Math.cos(2.0 * Math.PI * Math.random())
 }
-
-let secondsToSimulate = 1//4 * 3600
-const FPS = 25
-const dt = 1 / FPS
-const stepsToSimulate = secondsToSimulate * FPS
-const averageGroups = 999999999
-
-let stepNextGroupArrives;
-
-let intervalHandle = null
-
-let groupSizes = [[2, 0.5], [3, 0.2], [4, 0.3]].map(([size, probability]) => { return { size, probability } })
 
 function selectRandom(things) {
   const p = Math.random()
@@ -671,22 +677,29 @@ function selectRandom(things) {
   }
 }
 
+
+const FPS = 25
+const dt = 1 / FPS
+
+let stepNextGroupArrives;
+
+let intervalHandle = null
+
 function repeat(n, f) {
   for (let i = 0; i < n; i++) {
     f()
   }
 }
 
-let initialGroups = 3
-
 function createGroup() {
 
-  if (currentStep >= stepsToSimulate) return
+  if (currentStep >= stepsAcceptingGroups) return
 
   const id = nextGroupId++
+
   const group = {
-    x: groupEntranceExit.x,
-    y: groupEntranceExit.y,
+    x: entrance.x,
+    y: entrance.y,
     id: id,
     size: selectRandom(groupSizes).size,
     orderedItems: [],
@@ -696,6 +709,7 @@ function createGroup() {
     stepsEatingDesert: randomFromNormalDistribution(secondsEatingDesert) * FPS,
     stepsPaying: randomFromNormalDistribution(secondsPaying) * FPS
   }
+
   groups[group.id] = group
 
   new TaskSeat(group)
@@ -713,9 +727,19 @@ function transformMenuItems(items, type) {
   })
 }
 
+let loadConfig;
+
 function initializeSimulation() {
+
+  if (loadConfig) {
+    loadConfig();
+  } else {
+    return
+  }
+
+  stepsAcceptingGroups = secondsAcceptingGroups * FPS
   currentStep = 0
-  stepNextGroupArrives = poisson(averageGroups, stepsToSimulate)
+  stepNextGroupArrives = poisson(averageGroups, stepsAcceptingGroups)
 
   Task.initialize()
   TaskSeat.initialize()
@@ -728,13 +752,19 @@ function initializeSimulation() {
   TaskPay.initialize()
 
   income = 0;
+  totalGroups = 0;
+  totalGuests = 0;
 
-  tables = [
-    [50, 50, 4],
-    [150, 50, 3],
-    [250, 150, 2],
-    [350, 50, 2],
-  ]
+  {
+    const [x, y] = entrance
+    entrance = { x, y }
+  }
+
+  {
+    const [x, y] = kitchen
+    kitchen = { x, y }
+  }
+
   tables = tables.map(([x, y, size], id) => {
     const group = null
     return { x, y, size, group, id }
@@ -742,19 +772,6 @@ function initializeSimulation() {
 
   const allTables = new Set(tables.map(table => table.id))
 
-// TODO: do not accept more guests after, but keep going until no more groups.
-
-  staff = [
-    [500, 50, [], wage, false, false, false, true, false, false],
-    [500, 100, [], wage, false, false, false, false, true, true],
-    [550, 100, [], wage, false, false, false, false, true, true],
-    [550, 150, [], wage, false, false, true, false, false, false],
-    [550, 200, [0, 1], wage, false, true, false, false, false, false],
-    [550, 250, [2, 3], wage, false, true, false, false, false, false],
-    [550, 300, [], wage, false, true, false, false, false, false],
-    [225, 425, [], wage, true, false, false, false, false, false],
-    [375, 425, [], wage, true, false, false, false, false, false],
-  ]
   staff = staff.map(([x, y, tablesArray, wage, doesTaskSeat, doesTaskTakeOrder, doesTaskDeliverOrder, doesTaskPrepareDrink, doesTaskPrepareFood, doesTaskPrepareDesert], id) => {
     const tables = tablesArray.length == 0 ? allTables : new Set(tablesArray)
     const task = null
@@ -763,27 +780,16 @@ function initializeSimulation() {
     return { id, x, y, idleLocation, tables, wage, doesTaskSeat, doesTaskTakeOrder, doesTaskDeliverOrder, doesTaskPrepareDrink, doesTaskPrepareFood, doesTaskPrepareDesert, task, stepsIdle }
   })
 
-  drinks = [
-    ["Cola", 0.5, 1.5, 2],
-    ["Martini", 0.5, 2, 6],
-  ]
   drinks = transformMenuItems(drinks, "drink")
-
-  foods = [
-    ["Rice", 0.5, 3, 10],
-    ["Potatoes", 0.5, 4, 15],
-  ]
   foods = transformMenuItems(foods, "food")
-
-  deserts = [
-    ["Coffee", 0.5, 2, 10],
-    ["Ice cream", 0.5, 2, 5],
-  ]
   deserts = transformMenuItems(deserts, "desert")
 
   nextGroupId = 0
   groups = {}
-  repeat(initialGroups, createGroup)
+
+  groupSizes = groupSizes.map(([size, probability]) => { return { size, probability } })
+
+  repeat(randomFromNormalDistribution(initialGroups), createGroup)
 
   window.clearInterval(intervalHandle)
   intervalHandle = null
@@ -805,11 +811,11 @@ function doStep() {
     // spawn group
     createGroup()
 
-    stepNextGroupArrives = currentStep + poisson(averageGroups, stepsToSimulate)
+    stepNextGroupArrives = currentStep + poisson(averageGroups, stepsAcceptingGroups)
   }
 
   // do not seat new groups after closing
-  if (currentStep >= stepsToSimulate) {
+  if (currentStep >= stepsAcceptingGroups) {
     for (const id in TaskSeat.open) {
       const task = TaskSeat.open[id]
 
@@ -822,7 +828,7 @@ function doStep() {
 
   for (const id in Task.taken) {
     const task = Task.taken[id]
-    
+
     task.doStep()
   }
 
@@ -852,8 +858,6 @@ function doStep() {
 
       const neareastTable = sorted(smallestAvailableTables, nearest(task.group))[0]
 
-      //console.log(`Seating group ${task.group.id}, staff ${nearestStaff.id} at table ${neareastTable.id}.`)
-
       task.table = neareastTable
       task.staff = nearestStaff
 
@@ -875,8 +879,6 @@ function doStep() {
 
     const nearestStaff = sorted(availableStaff, nearest(task.table))[0]
 
-    //console.log(`Taking drinks order from table ${task.table.id}, staff ${nearestStaff.id}.`)
-
     task.staff = nearestStaff
     task.staff.task = task
 
@@ -891,8 +893,6 @@ function doStep() {
     if (availableStaff.length == 0) continue;
 
     const nearestStaff = sorted(availableStaff, nearest(task.table))[0]
-
-    //console.log(`Taking food order from table ${task.table.id}, staff ${nearestStaff.id}.`)
 
     task.staff = nearestStaff
     task.staff.task = task
@@ -909,8 +909,6 @@ function doStep() {
 
     const nearestStaff = sorted(availableStaff, nearest(task.table))[0]
 
-    //console.log(`Taking desert order from table ${task.table.id}, staff ${nearestStaff.id}.`)
-
     task.staff = nearestStaff
     task.staff.task = task
 
@@ -926,8 +924,6 @@ function doStep() {
 
     const nearestStaff = sorted(availableStaff, nearest(task.table))[0]
 
-    //console.log(`Taking desert order from table ${task.table.id}, staff ${nearestStaff.id}.`)
-
     task.staff = nearestStaff
     task.staff.task = task
 
@@ -939,7 +935,10 @@ function doStep() {
     const task = TaskPrepareItem.open[id]
 
     const availableStaff = staff.filter(s => s.task == null && canPrepareItem(s, task.item))
-    if (availableStaff.length == 0) continue;
+    if (availableStaff.length == 0) {
+      log('no staff available')
+      continue;
+    }
 
     const nearestStaff = sorted(availableStaff, nearest(kitchen))[0]
 
@@ -955,8 +954,6 @@ function doStep() {
 
     if (task.staff.task != null) continue;
 
-    //console.log(`Deliver order by table ${task.order.table.id}, staff ${task.staff.id}.`)
-
     task.staff.task = task
 
     delete TaskDeliverOrder.open[task.id]
@@ -967,11 +964,12 @@ function doStep() {
     const task = TaskDeliverItems.open[id]
 
     const availableStaff = staff.filter(s => s.task == null && s.doesTaskDeliverOrder)
-    if (availableStaff.length == 0) continue;
+    if (availableStaff.length == 0) {
+      log('no staff available')
+      continue;
+    }
 
     const nearestStaff = sorted(availableStaff, nearest(kitchen))[0]
-
-    //console.log(`Deliver items to table ${task.order.table.id}, staff ${nearestStaff.id}.`)
 
     task.staff = nearestStaff
     task.staff.task = task
@@ -983,7 +981,8 @@ function doStep() {
   // idle staff
   for (const s of staff) {
     if (!s.task) {
-      if (currentStep < stepsToSimulate) {
+      // only count idle steps during actual simulation time
+      if (currentStep < stepsAcceptingGroups) {
         s.stepsIdle++
       }
 
@@ -994,8 +993,21 @@ function doStep() {
   currentStep++
 }
 
+function hms(step) {
+  const seconds = Math.ceil(step /FPS)
+  const ms = seconds % 3600
+  const h = (seconds - ms) / 3600
+  const s = ms % 60;
+  const m = (ms - s) / 60
+
+  return `${h}:${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`
+}
+
+
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+  ctx.scale(scale, scale)
 
   drawTables()
   drawKitchen()
@@ -1003,16 +1015,18 @@ function draw() {
   drawGroups()
   drawStaff()
 
+  ctx.scale(1 / scale, 1 / scale)
+
   ctx.textBaseline = "top";
   ctx.textAlign = "left";
-  ctx.font = `12px Arial`;
-  ctx.fillText(Math.floor(currentStep / FPS), 2, 2)
+  ctx.font = `18px Arial`;
+  ctx.fillText(hms(currentStep), 2, 2)
 }
 
-let timeScale = 1000
+let timeScale;
 
 function shouldStep() {
-  return currentStep < stepsToSimulate || Object.keys(groups).length > 0
+  return currentStep < stepsAcceptingGroups || Object.keys(groups).length > 0
 }
 
 function frame() {
@@ -1024,7 +1038,7 @@ function frame() {
       window.clearInterval(intervalHandle)
       intervalHandle = null
     }
-    
+
   }
 
   draw()
@@ -1043,4 +1057,109 @@ document.getElementById("reset").addEventListener("click", () => {
   initializeSimulation()
 })
 
+const initialConfig = `secondsAcceptingGroups = 2 * 60 * 60
+groupSizes = [
+  [2, 0.5],
+  [3, 0.2],
+  [4, 0.3]
+]
+averageGroups = 200
+initialGroups = { mean: 4, standardDeviation: 2 }
+
+secondsOrdering = { mean: 10, standardDeviation: 5 }
+secondsDecidingFood = { mean: 5 * 60, standardDeviation: 3 * 60 }
+secondsEatingFood = { mean: 15 * 60, standardDeviation: 5 * 60 }
+secondsEatingDesert = { mean: 10 * 60, standardDeviation: 3 * 60 }
+secondsPaying = { mean: 30, standardDeviation: 10 }
+
+entrance = [300, 550]
+kitchen = [550, 50]
+
+drinks = [
+  ["Cola", 0.5, 1.5, 2],
+  ["Martini", 0.5, 2, 6],
+]
+
+foods = [
+  ["Rice", 0.5, 3, 10],
+  ["Potatoes", 0.5, 4, 15],
+]
+
+deserts = [
+  ["Coffee", 0.5, 2, 10],
+  ["Ice cream", 0.5, 2, 5],
+]
+
+tables = [
+  [50, 50, 4],
+  [150, 50, 3],
+  [250, 150, 2],
+  [350, 50, 2],
+]
+
+// x, y, tafelnummers, uurloon, verwelkomen, bestellingenOpnemen, voedselBezorgen, drankBereiden, gerechtBereiden, nagerechtBereiden
+staff = [
+  [500, 100, [], 12, false, false, false, false, true, true],
+  [550, 100, [], 15, false, false, false, false, true, true],
+  [550, 200, [0, 1], 10, false, true, true, true, false, false],
+  [550, 250, [2, 3], 10, false, true, true, true, false, false],
+  [225, 425, [], 14, true, true, true, false, false, false],
+]
+
+staffSendsOrdersRemotely = false`
+
+loadConfig = () => eval(initialConfig)
+
+configTextArea.value = initialConfig
+
+configTextArea.addEventListener('input', () => {
+
+  window.clearInterval(intervalHandle)
+  intervalHandle = null
+
+  const load = () => eval(configTextArea.value)
+
+  try {
+    load();
+    loadConfig = load
+    initializeSimulation()
+  } catch (e) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'red';
+    ctx.textBaseline = "top";
+    ctx.textAlign = "left";
+    ctx.font = `18px Arial`;
+    ctx.fillText('Invalid config: ' + e.message, 10, 10)
+  }
+})
+
 initializeSimulation()
+
+document.getElementById('result-only').addEventListener('click', () => {
+  initializeSimulation()
+  while (shouldStep()) {
+    doStep()
+  }
+  printMetrics()
+});
+
+[
+  "time-scale-1",
+  "time-scale-5",
+  "time-scale-10",
+  "time-scale-100",
+  "time-scale-1000"
+].forEach(id => {
+  
+  const radioBtn = document.getElementById(id)
+
+  if (radioBtn.checked) {
+    timeScale = parseInt(radioBtn.value)
+  }
+
+  radioBtn.addEventListener('change', () => {
+    if (radioBtn.checked) {
+      timeScale = parseInt(radioBtn.value)
+    }
+  })
+})
