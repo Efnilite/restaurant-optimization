@@ -107,7 +107,7 @@
 
   <script>
     let logging = false;
-    
+
     function log(x) {
       if (logging) console.log(x)
     }
@@ -242,19 +242,55 @@
       const s = staff.map(s => { return { id: s.id, uptime: 1 - (s.stepsIdle / stepsAcceptingGroups) } });
       const wages = staff.map(s => s.wage * secondsAcceptingGroups / 3600).reduce((a, b) => a + b, 0)
 
-      return {
+      return [{
         totalSeconds: currentStep / FPS,
         totalHMS: hms(currentStep),
         totalGroups: totalGroups,
         totalGuests: totalGuests,
         income: income,
         wages: wages,
-        staff: s
-      }
+      }, s]
     }
 
-    function printMetrics() {
-      console.log(JSON.stringify(calculateMetrics(), null, 2))
+    function printAverageMetrics(metrics) {
+      const totals = metrics.reduce((prev, curr) => {
+        const prevData = prev[0]
+        const currData = curr[0]
+        const prevStaff = prev[1]
+        const currStaff = curr[1]
+
+        Object.keys(currData).forEach(key => {
+          prevData[key] = (prevData[key] ?? []).concat(currData[key]);
+        })
+
+        Object.keys(currStaff).forEach(id => {
+          let prev = prevStaff[id] ?? {}
+          let curr = currStaff[id] ?? {}
+
+          Object.keys(curr).forEach(key => {
+            prev[key] = (prev[key] ?? []).concat(curr[key]);
+          })
+
+          prevStaff[id] = prev
+        })
+
+        return [prevData, prevStaff]
+      }, [{}, {}])
+
+      const stats = {stats: Object.keys(totals[0]).map(value => {
+        const values = totals[0][value]
+
+        return {value: value, avg: values.reduce((a, b) => a + b, 0) / values.length, median: values.sort()[Math.floor(values.length / 2)]}
+      }),
+      staff: Object.keys(totals[1]).map(id => {
+        return Object.keys(totals[1][id]).map(value => {
+          const values = totals[1][id][value]
+
+          return {value: value, avg: values.reduce((a, b) => a + b, 0) / values.length, median: values.sort()[Math.floor(values.length / 2)]}
+        })
+      })}
+
+      console.log(JSON.stringify(stats, null, 2))
     }
 
     class TaskPrepareItem extends Task {
@@ -1141,7 +1177,7 @@
         if (shouldStep()) {
           doStep()
         } else {
-          printMetrics()
+          printAverageMetrics([calculateMetrics()])
           window.clearInterval(intervalHandle)
           intervalHandle = null
         }
@@ -1243,11 +1279,19 @@ staffSendsOrdersRemotely = false`
     initializeSimulation()
 
     document.getElementById('result-only').addEventListener('click', () => {
-      initializeSimulation()
-      while (shouldStep()) {
-        doStep()
+      const runs = 2;
+      let metrics = []
+
+      for (let i = 0; i < runs; i++) {
+        initializeSimulation()
+        while (shouldStep()) {
+          doStep()
+        }
+        metrics[i] = calculateMetrics()
+        console.log(`Finished run ${i + 1}/${runs} (${((i + 1)/runs * 100).toFixed(1)}%)`)
       }
-      printMetrics()
+
+      printAverageMetrics(metrics)
     });
 
     [
