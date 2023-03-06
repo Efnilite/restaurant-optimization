@@ -1,0 +1,51 @@
+secondsAcceptingGroups = 2 * 60 * 60
+groupSizes = [
+  [2, 0.5],
+  [3, 0.2],
+  [4, 0.3]
+]
+averageGroups = 200
+initialGroups = { mean: 4, standardDeviation: 2 }
+
+secondsOrdering = { mean: 10, standardDeviation: 5 }
+secondsDecidingFood = { mean: 5 * 60, standardDeviation: 3 * 60 }
+secondsEatingFood = { mean: 15 * 60, standardDeviation: 5 * 60 }
+secondsEatingDesert = { mean: 10 * 60, standardDeviation: 3 * 60 }
+secondsPaying = { mean: 30, standardDeviation: 10 }
+
+entrance = [300, 550]
+kitchen = [550, 50]
+
+drinks = [
+  ["Cola", 0.4, 1.5, 2],
+  ["Martini", 0.4, 2, 6],
+  [null, 0.2, 0, 0]
+]
+
+foods = [
+  ["Rice", 0.5, 3, 10],
+  ["Potatoes", 0.5, 4, 15],
+]
+
+deserts = [
+  ["Coffee", 0.5, 2, 10],
+  ["Ice cream", 0.5, 2, 5],
+]
+
+tables = [
+  [50, 50, 4],
+  [150, 50, 3],
+  [250, 150, 2],
+  [350, 50, 2],
+]
+
+// x, y, tafelnummers, uurloon, verwelkomen, bestellingenOpnemen, voedselBezorgen, drankBereiden, gerechtBereiden, nagerechtBereiden
+staff = [
+  [500, 100, [], 12, false, false, false, false, true, true],
+  [550, 100, [], 15, false, false, false, false, true, true],
+  [550, 200, [0, 1], 10, false, true, true, true, false, false],
+  [550, 250, [2, 3], 10, false, true, true, true, false, false],
+  [225, 425, [], 14, true, true, true, false, false, false],
+]
+
+staffSendsOrdersRemotely = false

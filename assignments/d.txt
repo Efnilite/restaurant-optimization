@@ -1,0 +1,90 @@
+/*
+ Er zijn te weinig koks. Als we kijken naar de gemiddelde stats
+ van 10 runs, is de gemiddelde uptime van de staff het volgende:
+
+ 0 - 15.9%
+ 1 - 15.6%
+ 2 - 10.9%
+ 3 - 8.3%
+ 4 - 5.8%
+ 5 - 98.1%
+ 6 - 98.1%
+ 7 - 98.0%
+
+ Nummers 5 t/m 7 zijn allemaal koks. Deze hebben een veel te hoge
+ uptime, dus kunnen we de totale simulatietijd verminderen door
+ het aantal koks te vergroten.
+
+ Eerst voegen we 3 extra koks.
+ Hierdoor daalt de gemiddelde simulatietijd over 10 simulaties van
+ 55792.172 seconden -> 31025.492 seconden, oftewel 15.2 uur -> 8.6 uur
+
+ Hierbij offeren we wages op om op tijd naar huis te kunnen gaan en te kunnen slapen.
+*/
+
+secondsAcceptingGroups = 4 * 60 * 60
+groupSizes = [
+  [2, 0.3],
+  [3, 0.3],
+  [4, 0.4]
+]
+averageGroups = 40
+initialGroups = { mean: 1, standardDeviation: 1 }
+
+secondsOrdering = { mean: 10, standardDeviation: 5 }
+secondsDecidingFood = { mean: 5 * 60, standardDeviation: 3 * 60 }
+secondsEatingFood = { mean: 35 * 60, standardDeviation: 5 * 60 }
+secondsEatingDesert = { mean: 15 * 60, standardDeviation: 3 * 60 }
+secondsPaying = { mean: 30, standardDeviation: 10 }
+
+entrance = [150, 50]
+kitchen = [470, 1150]
+
+drinks = [
+  ["Cola", 0.5, 1.5, 10],
+  ["Martini", 0.5, 2, 30],
+]
+
+foods = [
+  ["Rijst", 0.5, 3, 25 * 60],
+  ["Aardappelen", 0.5, 4, 20 * 60],
+]
+
+deserts = [
+  ["Cognac", 0.5, 2, 3 * 60],
+  ["Ijs", 0.5, 2, 4 * 60],
+]
+
+tables = []
+
+for (let x = 0; x < 6; x++) {
+  tables.push([320 + 270 * x, 50, 2])
+}
+
+for (let x = 0; x < 7; x++) {
+  for (let y = 0; y < 4; y++) {
+    tables.push([50 + 270 * x, 300 + 200 * y, 4])
+  }
+}
+
+// x, y, tafelnummers, uurloon, verwelkomen, bestellingenOpnemen, voedselBezorgen, drankBereiden, gerechtBereiden, nagerechtBereiden
+staff = [
+  [150, 150, [], 14, true, true, true, false, false, false],
+  [600, 1150, [], 12, false, true, true, true, false, false],
+  [600, 1150, [], 12, false, true, true, true, false, false],
+  [600, 1150, [], 12, false, true, true, true, false, false],
+  [600, 1150, [], 12, false, true, true, true, false, false],
+  [470, 1250, [], 15, false, false, false, false, true, true],
+  [470, 1250, [], 15, false, false, false, false, true, true],
+  [470, 1250, [], 15, false, false, false, false, true, true],
+
+  [470, 1250, [], 15, false, false, false, false, true, true],
+  [470, 1250, [], 15, false, false, false, false, true, true],
+  [470, 1250, [], 15, false, false, false, false, true, true],
+
+  [470, 1250, [], 15, false, false, false, false, true, true],
+  [470, 1250, [], 15, false, false, false, false, true, true],
+  [470, 1250, [], 15, false, false, false, false, true, true],
+]
+
+staffSendsOrdersRemotely = false
