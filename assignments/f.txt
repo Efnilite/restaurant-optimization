@@ -1,0 +1,303 @@
+
+
+=== Originele verdeling ===
+
+{
+  "stats": [
+    {
+      "value": "totalSeconds",
+      "avg": 8864.52,
+      "median": 9019.64
+    },
+    {
+      "value": "totalHMS",
+      "avg": null,
+      "median": "2:30:20"
+    },
+    {
+      "value": "totalGroups",
+      "avg": 16.7,
+      "median": 17
+    },
+    {
+      "value": "totalGuests",
+      "avg": 43.2,
+      "median": 43
+    },
+    {
+      "value": "income",
+      "avg": 384.95,
+      "median": 385.5
+    },
+    {
+      "value": "wages",
+      "avg": 122,
+      "median": 122
+    }
+  ],
+  "staff": [
+    [
+      {
+        "value": "id",
+        "avg": 0,
+        "median": 0
+      },
+      {
+        "value": "uptime",
+        "avg": 0.05437666666666667,
+        "median": 0.05607777777777778
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 1,
+        "median": 1
+      },
+      {
+        "value": "uptime",
+        "avg": 0.05667222222222222,
+        "median": 0.05648888888888892
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 2,
+        "median": 2
+      },
+      {
+        "value": "uptime",
+        "avg": 0.07238777777777775,
+        "median": 0.07334444444444443
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 3,
+        "median": 3
+      },
+      {
+        "value": "uptime",
+        "avg": 0.08009666666666666,
+        "median": 0.08395555555555556
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 4,
+        "median": 4
+      },
+      {
+        "value": "uptime",
+        "avg": 0.19518888888888886,
+        "median": 0.20052777777777775
+      }
+    ]
+  ]
+}
+
+=== Zonder verdeling ===
+
+{
+  "stats": [
+    {
+      "value": "totalSeconds",
+      "avg": 9220.044,
+      "median": 9318.8
+    },
+    {
+      "value": "totalHMS",
+      "avg": null,
+      "median": "2:35:19"
+    },
+    {
+      "value": "totalGroups",
+      "avg": 17.5,
+      "median": 18
+    },
+    {
+      "value": "totalGuests",
+      "avg": 45.6,
+      "median": 47
+    },
+    {
+      "value": "income",
+      "avg": 410.7,
+      "median": 421
+    },
+    {
+      "value": "wages",
+      "avg": 122,
+      "median": 122
+    }
+  ],
+  "staff": [
+    [
+      {
+        "value": "id",
+        "avg": 0,
+        "median": 0
+      },
+      {
+        "value": "uptime",
+        "avg": 0.05578055555555554,
+        "median": 0.056777777777777816
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 1,
+        "median": 1
+      },
+      {
+        "value": "uptime",
+        "avg": 0.06250166666666665,
+        "median": 0.06444444444444442
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 2,
+        "median": 2
+      },
+      {
+        "value": "uptime",
+        "avg": 0.11250611111111111,
+        "median": 0.11356111111111111
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 3,
+        "median": 3
+      },
+      {
+        "value": "uptime",
+        "avg": 0.05108222222222224,
+        "median": 0.050694444444444486
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 4,
+        "median": 4
+      },
+      {
+        "value": "uptime",
+        "avg": 0.2069027777777778,
+        "median": 0.2123611111111111
+      }
+    ]
+  ]
+}
+
+=== Rohamverdeling ===
+Bediener #1: [0, 2]
+Biedener #2: [1, 3]
+Idee: gelijke verdeling van gasten tussen de werknemers 
+
+{
+  "stats": [
+    {
+      "value": "totalSeconds",
+      "avg": 9138.78,
+      "median": 9290.16
+    },
+    {
+      "value": "totalHMS",
+      "avg": null,
+      "median": "2:34:51"
+    },
+    {
+      "value": "totalGroups",
+      "avg": 16.7,
+      "median": 17
+    },
+    {
+      "value": "totalGuests",
+      "avg": 43,
+      "median": 42
+    },
+    {
+      "value": "income",
+      "avg": 387.45,
+      "median": 378
+    },
+    {
+      "value": "wages",
+      "avg": 122,
+      "median": 122
+    }
+  ],
+  "staff": [
+    [
+      {
+        "value": "id",
+        "avg": 0,
+        "median": 0
+      },
+      {
+        "value": "uptime",
+        "avg": 0.05389333333333333,
+        "median": 0.05493333333333328
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 1,
+        "median": 1
+      },
+      {
+        "value": "uptime",
+        "avg": 0.05655388888888889,
+        "median": 0.05721666666666669
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 2,
+        "median": 2
+      },
+      {
+        "value": "uptime",
+        "avg": 0.06851222222222222,
+        "median": 0.06958888888888892
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 3,
+        "median": 3
+      },
+      {
+        "value": "uptime",
+        "avg": 0.08550777777777778,
+        "median": 0.08325000000000005
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 4,
+        "median": 4
+      },
+      {
+        "value": "uptime",
+        "avg": 0.19051444444444443,
+        "median": 0.19294999999999995
+      }
+    ]
+  ]
+}
+
+Uit onze simulaties van 10 runs per keer blijkt dat de originele verdeling het meest optimaal is.
