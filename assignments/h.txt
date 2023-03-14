@@ -1,0 +1,197 @@
+=== Origineel ===
+
+{
+  "stats": [
+    {
+      "value": "totalSeconds",
+      "avg": 8778.52,
+      "median": 8928.04
+    },
+    {
+      "value": "totalHMS",
+      "avg": null,
+      "median": "2:28:49"
+    },
+    {
+      "value": "totalGroups",
+      "avg": 16.8,
+      "median": 17
+    },
+    {
+      "value": "totalGuests",
+      "avg": 43.1,
+      "median": 44
+    },
+    {
+      "value": "income",
+      "avg": 387.3,
+      "median": 387.5
+    },
+    {
+      "value": "wages",
+      "avg": 122,
+      "median": 122
+    }
+  ],
+  "staff": [
+    [
+      {
+        "value": "id",
+        "avg": 0,
+        "median": 0
+      },
+      {
+        "value": "uptime",
+        "avg": 0.054355,
+        "median": 0.055227777777777765
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 1,
+        "median": 1
+      },
+      {
+        "value": "uptime",
+        "avg": 0.0588088888888889,
+        "median": 0.058566666666666656
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 2,
+        "median": 2
+      },
+      {
+        "value": "uptime",
+        "avg": 0.0739488888888889,
+        "median": 0.07408888888888887
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 3,
+        "median": 3
+      },
+      {
+        "value": "uptime",
+        "avg": 0.08421333333333332,
+        "median": 0.08197777777777782
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 4,
+        "median": 4
+      },
+      {
+        "value": "uptime",
+        "avg": 0.1980122222222222,
+        "median": 0.19865
+      }
+    ]
+  ]
+}
+
+=== Staff sends orders remotely ===
+
+{
+  "stats": [
+    {
+      "value": "totalSeconds",
+      "avg": 8772.011999999999,
+      "median": 8863.16
+    },
+    {
+      "value": "totalHMS",
+      "avg": null,
+      "median": "2:27:44"
+    },
+    {
+      "value": "totalGroups",
+      "avg": 16.7,
+      "median": 17
+    },
+    {
+      "value": "totalGuests",
+      "avg": 43,
+      "median": 43
+    },
+    {
+      "value": "income",
+      "avg": 385.85,
+      "median": 389
+    },
+    {
+      "value": "wages",
+      "avg": 122,
+      "median": 122
+    }
+  ],
+  "staff": [
+    [
+      {
+        "value": "id",
+        "avg": 0,
+        "median": 0
+      },
+      {
+        "value": "uptime",
+        "avg": 0.05379055555555554,
+        "median": 0.05494444444444446
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 1,
+        "median": 1
+      },
+      {
+        "value": "uptime",
+        "avg": 0.05714000000000001,
+        "median": 0.05642222222222226
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 2,
+        "median": 2
+      },
+      {
+        "value": "uptime",
+        "avg": 0.06829333333333333,
+        "median": 0.06432222222222217
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 3,
+        "median": 3
+      },
+      {
+        "value": "uptime",
+        "avg": 0.08800722222222221,
+        "median": 0.09043888888888885
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 4,
+        "median": 4
+      },
+      {
+        "value": "uptime",
+        "avg": 0.18430666666666667,
+        "median": 0.18979999999999997
+      }
+    ]
+  ]
+}
