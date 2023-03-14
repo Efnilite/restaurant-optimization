@@ -31,7 +31,8 @@ drinks = [
 foods = [
   ["Rice", 0.25, 3, 10],
   ["Rice with Teriyaki", 0.25, 2.5, 15],
-  ["Potatoes", 0.5, 4, 15],
+  ["Potatoes", 0.25, 4, 15],
+  ["Potatoes with Truffel", 0.25, 3, 20],
 ]
 
 deserts = [
