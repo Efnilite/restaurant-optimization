@@ -1,0 +1,454 @@
+=== Originele verdeling ===
+
+Winst: 263 euro
+
+{
+  "stats": [
+    {
+      "value": "totalSeconds",
+      "avg": 8864.52,
+      "median": 9019.64
+    },
+    {
+      "value": "totalHMS",
+      "avg": null,
+      "median": "2:30:20"
+    },
+    {
+      "value": "totalGroups",
+      "avg": 16.7,
+      "median": 17
+    },
+    {
+      "value": "totalGuests",
+      "avg": 43.2,
+      "median": 43
+    },
+    {
+      "value": "income",
+      "avg": 384.95,
+      "median": 385.5
+    },
+    {
+      "value": "wages",
+      "avg": 122,
+      "median": 122
+    }
+  ],
+  "staff": [
+    [
+      {
+        "value": "id",
+        "avg": 0,
+        "median": 0
+      },
+      {
+        "value": "uptime",
+        "avg": 0.05437666666666667,
+        "median": 0.05607777777777778
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 1,
+        "median": 1
+      },
+      {
+        "value": "uptime",
+        "avg": 0.05667222222222222,
+        "median": 0.05648888888888892
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 2,
+        "median": 2
+      },
+      {
+        "value": "uptime",
+        "avg": 0.07238777777777775,
+        "median": 0.07334444444444443
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 3,
+        "median": 3
+      },
+      {
+        "value": "uptime",
+        "avg": 0.08009666666666666,
+        "median": 0.08395555555555556
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 4,
+        "median": 4
+      },
+      {
+        "value": "uptime",
+        "avg": 0.19518888888888886,
+        "median": 0.20052777777777775
+      }
+    ]
+  ]
+}
+
+=== 1 toegevoegde bediener met 10 euro/uur ===
+
+Winst: 236
+
+Verdeling: 
+  [550, 200, [0, 1], 10, false, true, false, false, false, false],
+  [550, 250, [2, 3], 10, false, true, false, false, false, false],
+
+  [550, 250, [], 10, false, false, true, true, false, false],
+
+{
+  "stats": [
+    {
+      "value": "totalSeconds",
+      "avg": 9107.215999999999,
+      "median": 9055.84
+    },
+    {
+      "value": "totalHMS",
+      "avg": null,
+      "median": "2:30:56"
+    },
+    {
+      "value": "totalGroups",
+      "avg": 16.7,
+      "median": 17
+    },
+    {
+      "value": "totalGuests",
+      "avg": 42.1,
+      "median": 43
+    },
+    {
+      "value": "income",
+      "avg": 377.95,
+      "median": 385
+    },
+    {
+      "value": "wages",
+      "avg": 142,
+      "median": 142
+    }
+  ],
+  "staff": [
+    [
+      {
+        "value": "id",
+        "avg": 0,
+        "median": 0
+      },
+      {
+        "value": "uptime",
+        "avg": 0.051680000000000004,
+        "median": 0.05369444444444449
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 1,
+        "median": 1
+      },
+      {
+        "value": "uptime",
+        "avg": 0.05529999999999998,
+        "median": 0.054444444444444406
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 2,
+        "median": 2
+      },
+      {
+        "value": "uptime",
+        "avg": 0.024098333333333333,
+        "median": 0.021788888888888858
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 3,
+        "median": 3
+      },
+      {
+        "value": "uptime",
+        "avg": 0.05154111111111111,
+        "median": 0.05140555555555559
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 4,
+        "median": 4
+      },
+      {
+        "value": "uptime",
+        "avg": 0.07556166666666668,
+        "median": 0.07686111111111116
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 5,
+        "median": 5
+      },
+      {
+        "value": "uptime",
+        "avg": 0.198455,
+        "median": 0.18957777777777773
+      }
+    ]
+  ]
+}
+
+=== 1 toegevoegde bediener met 5 euro/uur ===
+
+Winst: 253
+
+Verdeling: 
+  [550, 200, [0, 1], 10, false, true, false, false, false, false],
+  [550, 250, [2, 3], 10, false, true, false, false, false, false],
+
+  [550, 250, [], 5, false, false, true, true, false, false],
+
+
+{
+  "stats": [
+    {
+      "value": "totalSeconds",
+      "avg": 8752.467999999999,
+      "median": 8873.48
+    },
+    {
+      "value": "totalHMS",
+      "avg": null,
+      "median": "2:27:54"
+    },
+    {
+      "value": "totalGroups",
+      "avg": 16.7,
+      "median": 17
+    },
+    {
+      "value": "totalGuests",
+      "avg": 42.5,
+      "median": 42
+    },
+    {
+      "value": "income",
+      "avg": 384.25,
+      "median": 386
+    },
+    {
+      "value": "wages",
+      "avg": 132,
+      "median": 132
+    }
+  ],
+  "staff": [
+    [
+      {
+        "value": "id",
+        "avg": 0,
+        "median": 0
+      },
+      {
+        "value": "uptime",
+        "avg": 0.05347333333333334,
+        "median": 0.05353333333333332
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 1,
+        "median": 1
+      },
+      {
+        "value": "uptime",
+        "avg": 0.05805444444444444,
+        "median": 0.05937222222222227
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 2,
+        "median": 2
+      },
+      {
+        "value": "uptime",
+        "avg": 0.018475555555555558,
+        "median": 0.01921666666666666
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 3,
+        "median": 3
+      },
+      {
+        "value": "uptime",
+        "avg": 0.05268833333333334,
+        "median": 0.05365555555555557
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 4,
+        "median": 4
+      },
+      {
+        "value": "uptime",
+        "avg": 0.08011444444444446,
+        "median": 0.08211111111111113
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 5,
+        "median": 5
+      },
+      {
+        "value": "uptime",
+        "avg": 0.19070388888888887,
+        "median": 0.19418888888888886
+      }
+    ]
+  ]
+}
+
+=== 1 bediening met 1 euro/uur ===
+
+Winst: 258
+
+{
+  "stats": [
+    {
+      "value": "totalSeconds",
+      "avg": 8789.716,
+      "median": 8877.8
+    },
+    {
+      "value": "totalHMS",
+      "avg": null,
+      "median": "2:27:58"
+    },
+    {
+      "value": "totalGroups",
+      "avg": 16.3,
+      "median": 16
+    },
+    {
+      "value": "totalGuests",
+      "avg": 42.4,
+      "median": 43
+    },
+    {
+      "value": "income",
+      "avg": 382.4,
+      "median": 385.5
+    },
+    {
+      "value": "wages",
+      "avg": 124,
+      "median": 124
+    }
+  ],
+  "staff": [
+    [
+      {
+        "value": "id",
+        "avg": 0,
+        "median": 0
+      },
+      {
+        "value": "uptime",
+        "avg": 0.05338999999999999,
+        "median": 0.05353333333333332
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 1,
+        "median": 1
+      },
+      {
+        "value": "uptime",
+        "avg": 0.058418888888888895,
+        "median": 0.058533333333333326
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 2,
+        "median": 2
+      },
+      {
+        "value": "uptime",
+        "avg": 0.02623333333333333,
+        "median": 0.028616666666666624
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 3,
+        "median": 3
+      },
+      {
+        "value": "uptime",
+        "avg": 0.04893333333333334,
+        "median": 0.04985555555555554
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 4,
+        "median": 4
+      },
+      {
+        "value": "uptime",
+        "avg": 0.07769111111111111,
+        "median": 0.07813333333333339
+      }
+    ],
+    [
+      {
+        "value": "id",
+        "avg": 5,
+        "median": 5
+      },
+      {
+        "value": "uptime",
+        "avg": 0.1942366666666667,
+        "median": 0.19486111111111115
+      }
+    ]
+  ]
+}
+
+Gebaseerd op de data van onze 40 runs is er geen prijs waarbij deze extra persoon inhuren goedkoper is. 
